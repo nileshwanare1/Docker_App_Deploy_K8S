@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Registration</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        width: 400px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    input:focus {
+        border-color: #4facfe;
+        outline: none;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 12px;
+        cursor: pointer;
+        color: #555;
+    }
+
+    .strength {
+        margin-top: 5px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .weak {
+        color: red;
+    }
+
+    .medium {
+        color: orange;
+    }
+
+    .strong {
+        color: green;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #4facfe;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #2b8cff;
+    }
+
+    .success {
+        text-align: center;
+        color: green;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    .error {
+        color: red;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Create Account</h2>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label>Mobile Number</label>
+            <input type="tel" id="mobile" required>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" required>
+                <span class="toggle-password" onclick="togglePassword()">👁</span>
+            </div>
+            <div id="strength" class="strength"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" required>
+            <div id="passwordError" class="error"></div>
+        </div>
+
+        <button type="submit">Register</button>
+
+        <div id="successMessage" class="success"></div>
+    </form>
+</div>
+
+<script>
+const passwordInput = document.getElementById("password");
+const strengthText = document.getElementById("strength");
+
+passwordInput.addEventListener("input", function() {
+    const password = passwordInput.value;
+
+    if(password.length < 6) {
+        strengthText.textContent = "Weak Password";
+        strengthText.className = "strength weak";
+    } else if(password.length < 10) {
+        strengthText.textContent = "Medium Password";
+        strengthText.className = "strength medium";
+    } else {
+        strengthText.textContent = "Strong Password";
+        strengthText.className = "strength strong";
+    }
+});
+
+function togglePassword() {
+    const passwordField = document.getElementById("password");
+
+    if(passwordField.type === "password") {
+        passwordField.type = "text";
+    } else {
+        passwordField.type = "password";
+    }
+}
+
+document.getElementById("registerForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const errorDiv = document.getElementById("passwordError");
+    const successDiv = document.getElementById("successMessage");
+
+    errorDiv.textContent = "";
+    successDiv.textContent = "";
+
+    if(password !== confirmPassword) {
+        errorDiv.textContent = "Passwords do not match!";
+        return;
+    }
+
+    successDiv.textContent = "🎉 Registration Successful!";
+    document.getElementById("registerForm").reset();
+    strengthText.textContent = "";
+});
+</script>
+
+</body>
+</html>
