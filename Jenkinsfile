@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AWS_DEFAULT_REGION = "ap-south-1"
-        ECR_REGISTRY = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
-        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com/my-nginx-app"
-        IMAGE_TAG = "latest"
-    }
+    AWS_DEFAULT_REGION = "ap-south-1"
+    ECR_REGISTRY = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
+    ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com/dockerimage"
+    IMAGE_TAG = "latest"
+}
 
     stages {
 
