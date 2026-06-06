@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = "ap-south-1"
-        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com/my-nginx-app"
         ECR_REGISTRY = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
+        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com/my-nginx-app"
         IMAGE_TAG = "latest"
     }
 
@@ -13,8 +13,8 @@ pipeline {
         stage('Debug') {
             steps {
                 bat 'echo AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%'
-                bat 'echo ECR_REPO=%ECR_REPO%'
                 bat 'echo ECR_REGISTRY=%ECR_REGISTRY%'
+                bat 'echo ECR_REPO=%ECR_REPO%'
             }
         }
 
@@ -32,17 +32,28 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                bat '''
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+
+                    bat 'aws sts get-caller-identity'
+
+                    bat '''
                     aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%
-                '''
+                    '''
 
-                bat '''
+                    bat '''
                     docker tag my-nginx-app:latest %ECR_REPO%:%IMAGE_TAG%
-                '''
+                    '''
 
-                bat '''
+                    bat '''
                     docker push %ECR_REPO%:%IMAGE_TAG%
-                '''
+                    '''
+                }
             }
         }
 
