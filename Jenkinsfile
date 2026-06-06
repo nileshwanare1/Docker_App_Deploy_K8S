@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = "ap-south-1"   // change to your region
-        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com/my-nginx-app:latest"
+        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
         IMAGE_TAG = "latest"
     }
 
@@ -11,7 +11,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'docker build -t my-nginx-app .'
+                    bat 'docker build -t my-nginx-app .'
                 }
             }
         }
@@ -20,17 +20,17 @@ pipeline {
             steps {
                 script {
                     // simple container test
-                    sh 'docker run --rm my-nginx-app nginx -v'
+                    bat 'docker run --rm my-nginx-app nginx -v'
                 }
             }
         }
 
-        stage('Push to ECR') {
+        stage('Pubat to ECR') {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO'
-                    sh 'docker tag my-nginx-app:latest $ECR_REPO:$IMAGE_TAG'
-                    sh 'docker push $ECR_REPO:$IMAGE_TAG'
+                    bat 'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO'
+                    bat 'docker tag my-nginx-app:latest $ECR_REPO:$IMAGE_TAG'
+                    bat 'docker pubat $ECR_REPO:$IMAGE_TAG'
                 }
             }
         }
@@ -38,8 +38,8 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 script {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
+                    bat 'kubectl apply -f deployment.yaml'
+                    bat 'kubectl apply -f service.yaml'
                 }
             }
         }
