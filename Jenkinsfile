@@ -2,46 +2,65 @@ pipeline {
     agent any
 
     environment {
-        AWS_DEFAULT_REGION = "ap-south-1"   // change to your region
-        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
+        AWS_DEFAULT_REGION = "ap-south-1"
+        ECR_REPO = "286008326537.dkr.ecr.ap-south-1.amazonaws.com/my-nginx-app"
+        ECR_REGISTRY = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
         IMAGE_TAG = "latest"
     }
 
     stages {
+
+        stage('Debug') {
+            steps {
+                bat 'echo AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%'
+                bat 'echo ECR_REPO=%ECR_REPO%'
+                bat 'echo ECR_REGISTRY=%ECR_REGISTRY%'
+            }
+        }
+
         stage('Build') {
             steps {
-                script {
-                    bat 'docker build -t my-nginx-app .'
-                }
+                bat 'docker build -t my-nginx-app .'
             }
         }
 
         stage('Test') {
             steps {
-                script {
-                    // simple container test
-                    bat 'docker run --rm my-nginx-app nginx -v'
-                }
+                bat 'docker run --rm my-nginx-app nginx -v'
             }
         }
 
-        stage('Pubat to ECR') {
+        stage('Push to ECR') {
             steps {
-                script {
-                    bat 'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO'
-                    bat 'docker tag my-nginx-app:latest $ECR_REPO:$IMAGE_TAG'
-                    bat 'docker pubat $ECR_REPO:$IMAGE_TAG'
-                }
+                bat '''
+                    aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%
+                '''
+
+                bat '''
+                    docker tag my-nginx-app:latest %ECR_REPO%:%IMAGE_TAG%
+                '''
+
+                bat '''
+                    docker push %ECR_REPO%:%IMAGE_TAG%
+                '''
             }
         }
 
         stage('Deploy to EKS') {
             steps {
-                script {
-                    bat 'kubectl apply -f deployment.yaml'
-                    bat 'kubectl apply -f service.yaml'
-                }
+                bat 'kubectl apply -f deployment.yaml'
+                bat 'kubectl apply -f service.yaml'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed. Check console logs.'
         }
     }
 }
