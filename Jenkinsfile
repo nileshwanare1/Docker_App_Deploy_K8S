@@ -1,7 +1,6 @@
 pipeline {
 agent any
 
-```
 environment {
     AWS_DEFAULT_REGION = "ap-south-1"
     ECR_REGISTRY = "286008326537.dkr.ecr.ap-south-1.amazonaws.com"
@@ -90,6 +89,5 @@ post {
         echo 'Pipeline failed. Check console logs.'
     }
 }
-```
 
 }
